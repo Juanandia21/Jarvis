@@ -11,6 +11,7 @@ import re
 from jarvis.actions.applications import ApplicationActions
 from jarvis.actions.routines import RoutineActions
 from jarvis.core.results import CommandResult
+from jarvis.core.speech import SpeechService
 
 
 class CommandRouter:
@@ -18,15 +19,38 @@ class CommandRouter:
         self,
         applications: ApplicationActions,
         routines: RoutineActions,
+        speech: SpeechService,
     ) -> None:
         self.applications = applications
         self.routines = routines
+        self.speech = speech
 
     def handle(self, text: str) -> CommandResult:
         normalized = self._normalize(text)
 
         if normalized in {"modo gaming", "activa modo gaming", "activar modo gaming"}:
             return self.routines.run("gaming")
+
+        if normalized in {"voces", "listar voces", "mostrar voces"}:
+            voices = self.speech.voices()
+            if not voices:
+                return CommandResult(
+                    "No hay voces locales disponibles. Instala una voz de Windows.",
+                    success=False,
+                )
+            options = " | ".join(f"voz {number}: {name}" for number, name in voices)
+            return CommandResult(options, speak=False)
+
+        match = re.fullmatch(r"voz\s+(\d+)", normalized)
+        if match:
+            number = int(match.group(1))
+            selected = self.speech.select_voice(number)
+            if selected is None:
+                return CommandResult(
+                    "No existe esa voz. Escribe 'voces' para ver las disponibles.",
+                    success=False,
+                )
+            return CommandResult(f"Voz {number} seleccionada: {selected}.")
 
         match = re.fullmatch(r"(?:abre|abrir|inicia|iniciar)\s+(.+)", normalized)
         if match:

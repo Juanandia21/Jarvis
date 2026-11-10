@@ -16,7 +16,7 @@ class JarvisApplication:
         self.speech = SpeechService()
         self.actions = ApplicationActions(config.apps)
         self.routines = RoutineActions(config.routines, self.actions)
-        self.router = CommandRouter(self.actions, self.routines)
+        self.router = CommandRouter(self.actions, self.routines, self.speech)
 
     def run(self) -> None:
         self.ui.show("ready", "Jarvis listo. Escribe un comando o 'salir'.")
@@ -37,6 +37,7 @@ class JarvisApplication:
             self.ui.show("processing", "Procesando...")
             result = self.router.handle(text)
             self.ui.show("ready", result.message)
-            self.speech.say(result.message)
+            if result.speak:
+                self.speech.say(result.message)
 
         self.ui.show("stopped", "Jarvis apagado.")

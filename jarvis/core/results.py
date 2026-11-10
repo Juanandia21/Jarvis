@@ -9,3 +9,4 @@ from dataclasses import dataclass
 class CommandResult:
     message: str
     success: bool = True
+    speak: bool = True

@@ -22,3 +22,24 @@ class SpeechService:
             return
         self._engine.say(text)
         self._engine.runAndWait()
+
+    def available(self) -> bool:
+        return self._engine is not None
+
+    def voices(self) -> list[tuple[int, str]]:
+        if self._engine is None:
+            return []
+        result = []
+        for index, voice in enumerate(self._engine.getProperty("voices")):
+            name = getattr(voice, "name", None) or getattr(voice, "id", "Voz")
+            result.append((index + 1, str(name)))
+        return result
+
+    def select_voice(self, number: int) -> str | None:
+        if self._engine is None:
+            return None
+        voices = self._engine.getProperty("voices")
+        if number < 1 or number > len(voices):
+            return None
+        self._engine.setProperty("voice", voices[number - 1].id)
+        return str(getattr(voices[number - 1], "name", voices[number - 1].id))
