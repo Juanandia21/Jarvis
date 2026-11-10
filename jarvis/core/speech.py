@@ -54,13 +54,15 @@ class SpeechService:
         return self._edge_tts is not None or self._engine is not None
 
     def voices(self) -> list[tuple[int, str]]:
+        if self._edge_tts is None:
+            return []
         return [
             (index, f"{name} [Edge neural]")
             for index, (_, name) in enumerate(EDGE_VOICES, start=1)
         ]
 
     def select_voice(self, number: int) -> str | None:
-        if number < 1 or number > len(EDGE_VOICES):
+        if self._edge_tts is None or number < 1 or number > len(EDGE_VOICES):
             return None
         voice_id, name = EDGE_VOICES[number - 1]
         self._selected_edge_voice = voice_id
@@ -79,6 +81,7 @@ class SpeechService:
                 path = file.name
 
             asyncio.run(self._create_edge_audio(text, path))
+            print(f"[VOZ] Edge neural: {self._selected_edge_voice}")
             self._pygame.mixer.music.load(path)
             self._pygame.mixer.music.play()
             while self._pygame.mixer.music.get_busy():

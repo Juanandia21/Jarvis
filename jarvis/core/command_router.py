@@ -35,7 +35,7 @@ class CommandRouter:
             voices = self.speech.voices()
             if not voices:
                 return CommandResult(
-                    "No hay voces locales disponibles. Instala una voz de Windows.",
+                    "Edge TTS no está instalado. Ejecuta 'pip install -r requirements.txt'.",
                     success=False,
                 )
             options = " | ".join(f"voz {number}: {name}" for number, name in voices)
@@ -62,7 +62,7 @@ class CommandRouter:
                     success=False,
                 )
             return CommandResult(
-                f"Esta es la voz {number}, {selected}. Así sonaría Jarvis.",
+                f"Esta es la voz {number}, {selected}. Así sonaría Jarvis con Edge neural.",
             )
 
         if normalized in {"probar voces", "test voces"}:
