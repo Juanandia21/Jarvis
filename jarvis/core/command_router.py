@@ -12,6 +12,7 @@ from jarvis.actions.applications import ApplicationActions
 from jarvis.actions.routines import RoutineActions
 from jarvis.core.results import CommandResult
 from jarvis.core.speech import SpeechService
+from jarvis.actions.music import MusicActions
 
 
 class CommandRouter:
@@ -20,16 +21,36 @@ class CommandRouter:
         applications: ApplicationActions,
         routines: RoutineActions,
         speech: SpeechService,
+        music: MusicActions,
     ) -> None:
         self.applications = applications
         self.routines = routines
         self.speech = speech
+        self.music = music
 
     def handle(self, text: str) -> CommandResult:
         normalized = self._normalize(text)
 
         if normalized in {"modo gaming", "activa modo gaming", "activar modo gaming"}:
             return self.routines.run("gaming")
+
+        match = re.fullmatch(
+            r"(?:cierra|cerrar|cierra la|apaga|termina)\s+(.+)",
+            normalized,
+        )
+        if match:
+            return self.applications.close(match.group(1).strip())
+
+        match = re.fullmatch(
+            r"(?:pon|pone|ponga|reproduce|reproducí|reproducir|escucha|escuchar)"
+            r"\s+(.+?)(?:\s+en\s+(spotify|youtube music|youtube))?$",
+            normalized,
+        )
+        if match:
+            return self.music.play(
+                match.group(1),
+                (match.group(2) or "spotify").replace(" ", "_"),
+            )
 
         if normalized in {"voces", "listar voces", "mostrar voces"}:
             voices = self.speech.voices()
@@ -92,4 +113,4 @@ class CommandRouter:
     @staticmethod
     def _normalize(text: str) -> str:
         normalized = " ".join(text.casefold().strip().split())
-        return normalized.replace("abrí ", "abre ")
+        return normalized.replace("abrí ", "abre ").replace("reproducí ", "reproduce ")

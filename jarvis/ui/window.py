@@ -30,10 +30,16 @@ class JarvisWindow:
             def __init__(self) -> None:
                 super().__init__()
                 self.setWindowTitle("Jarvis")
-                self.setMinimumSize(640, 620)
+                self.setWindowFlags(
+                    Qt.FramelessWindowHint
+                    | Qt.Tool
+                    | Qt.WindowStaysOnTopHint
+                )
+                self.setAttribute(Qt.WA_TranslucentBackground)
+                self.setFixedSize(390, 390)
                 self.setStyleSheet(
                     """
-                    QDialog { background: #0b1120; color: #e7eef8; }
+                    QDialog { background: transparent; color: #e7eef8; }
                     QLabel#title { font-size: 30px; font-weight: bold; color: #dbeafe; }
                     QLabel#state { color: #93c5fd; font-size: 14px; }
                     QPlainTextEdit, QLineEdit {
@@ -71,17 +77,19 @@ class JarvisWindow:
                 self.result_ready.connect(self.show_result)
                 self.state_changed.connect(self.set_state)
 
-                buttons = QHBoxLayout()
-                buttons.addWidget(self.input)
-                buttons.addWidget(send)
-                buttons.addWidget(listen)
                 layout = QVBoxLayout(self)
-                layout.addWidget(title)
                 layout.addWidget(self.orb)
-                layout.addWidget(self.state)
-                layout.addWidget(self.history)
-                layout.addLayout(buttons)
+                layout.setContentsMargins(15, 15, 15, 15)
+                title.hide()
+                self.state.hide()
+                self.history.hide()
+                self.input.hide()
+                send.hide()
+                listen.hide()
                 self.start_wake_listener()
+
+            def mouseDoubleClickEvent(self, event) -> None:
+                self.close()
 
             def start_wake_listener(self) -> None:
                 Thread(

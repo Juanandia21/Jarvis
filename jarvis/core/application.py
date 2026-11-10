@@ -7,6 +7,7 @@ from jarvis.core.command_router import CommandRouter
 from jarvis.core.speech import SpeechService
 from jarvis.actions.applications import ApplicationActions
 from jarvis.actions.routines import RoutineActions
+from jarvis.actions.music import MusicActions
 from jarvis.ui.status import StatusUI
 
 
@@ -16,7 +17,8 @@ class JarvisApplication:
         self.speech = SpeechService()
         self.actions = ApplicationActions(config.apps)
         self.routines = RoutineActions(config.routines, self.actions)
-        self.router = CommandRouter(self.actions, self.routines, self.speech)
+        self.music = MusicActions()
+        self.router = CommandRouter(self.actions, self.routines, self.speech, self.music)
         self.window = None
 
     def process_command(self, text: str):

@@ -42,6 +42,35 @@ class ApplicationActions:
 
         return CommandResult(f"Abriendo {requested}.")
 
+    def close(self, requested: str) -> CommandResult:
+        name = self._normalize(requested)
+        target = self._applications.get(name)
+        if target is None:
+            return CommandResult(
+                f"No tengo configurada la aplicación '{requested}'.",
+                success=False,
+            )
+        process = self._process_name(name)
+        if os.name != "nt":
+            return CommandResult("Cerrar aplicaciones está implementado para Windows.", success=False)
+        result = subprocess.run(
+            ["taskkill", "/IM", process, "/T", "/F"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            return CommandResult(f"{requested} no estaba abierta.", success=False)
+        return CommandResult(f"Cerrando {requested}.")
+
+    @staticmethod
+    def _process_name(name: str) -> str:
+        return {
+            "spotify": "Spotify.exe",
+            "discord": "Discord.exe",
+            "navegador": "chrome.exe",
+        }.get(name, f"{name}.exe")
+
     @staticmethod
     def _open_discord() -> None:
         local_app_data = os.environ.get("LOCALAPPDATA", "")
