@@ -1,4 +1,4 @@
-"""Minimal visual interface with wake-word activation."""
+"""Jarvis cinematic desktop window."""
 
 from __future__ import annotations
 
@@ -15,11 +15,9 @@ class JarvisWindow:
         from PySide6.QtCore import Qt, Signal
         from PySide6.QtWidgets import (
             QDialog,
+            QFrame,
             QHBoxLayout,
             QLabel,
-            QLineEdit,
-            QPushButton,
-            QPlainTextEdit,
             QVBoxLayout,
         )
 
@@ -30,66 +28,66 @@ class JarvisWindow:
             def __init__(self) -> None:
                 super().__init__()
                 self.setWindowTitle("Jarvis")
-                self.setWindowFlags(
-                    Qt.FramelessWindowHint
-                    | Qt.Tool
-                    | Qt.WindowStaysOnTopHint
-                )
-                self.setAttribute(Qt.WA_TranslucentBackground)
-                self.setFixedSize(390, 390)
+                self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+                self.setFixedSize(760, 760)
                 self.setStyleSheet(
                     """
-                    QDialog { background: transparent; color: #f5e1c4; }
-                    QLabel#title { font-size: 30px; font-weight: bold; color: #dbeafe; }
-                    QLabel#state { color: #93c5fd; font-size: 14px; }
-                    QPlainTextEdit, QLineEdit {
-                        background: #111c31; color: #e7eef8;
-                        border: 1px solid #263d60; border-radius: 10px;
-                        padding: 9px;
+                    QDialog {
+                        background: #070808;
+                        color: #f7e4c4;
+                        border: 1px solid #6d3217;
+                        border-radius: 22px;
                     }
-                    QPushButton {
-                        background: #1d4ed8; color: white; border: 0;
-                        border-radius: 8px; padding: 10px 16px;
+                    QFrame#header {
+                        background: transparent;
+                        border-bottom: 1px solid #3a1c10;
                     }
-                    QPushButton:hover { background: #2563eb; }
-                    QPushButton:checked { background: #0e7490; }
+                    QLabel#brand {
+                        color: #ff9a3c;
+                        font-size: 15px;
+                        font-weight: bold;
+                        letter-spacing: 3px;
+                    }
+                    QLabel#status {
+                        color: #b8794a;
+                        font-size: 12px;
+                    }
+                    QLabel#hint {
+                        color: #704833;
+                        font-size: 11px;
+                    }
                     """
                 )
                 self.stop_event = threading.Event()
                 self.orb = StatusOrb().widget
-                self.state = QLabel("Di 'Jarvis' para activar")
-                self.state.setObjectName("state")
-                self.state.setAlignment(Qt.AlignCenter)
-                title = QLabel("JARVIS")
-                title.setObjectName("title")
-                title.setAlignment(Qt.AlignCenter)
-                self.history = QPlainTextEdit()
-                self.history.setReadOnly(True)
-                self.input = QLineEdit()
-                self.input.setPlaceholderText("Escribe un comando...")
-                send = QPushButton("Enviar")
-                listen = QPushButton("Escuchar")
-                listen.setCheckable(True)
-                self.listen_button = listen
-                send.clicked.connect(self.submit_text)
-                self.input.returnPressed.connect(self.submit_text)
-                listen.clicked.connect(self.listen)
-                self.result_ready.connect(self.show_result)
-                self.state_changed.connect(self.set_state)
+
+                header = QFrame()
+                header.setObjectName("header")
+                header_layout = QHBoxLayout(header)
+                header_layout.setContentsMargins(25, 16, 25, 13)
+                brand = QLabel("JARVIS  //  CORE ONLINE")
+                brand.setObjectName("brand")
+                self.status = QLabel("STANDBY")
+                self.status.setObjectName("status")
+                self.status.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                header_layout.addWidget(brand)
+                header_layout.addStretch()
+                header_layout.addWidget(self.status)
+
+                hint = QLabel("LISTENING FOR WAKE WORD  •  DOUBLE-CLICK TO CLOSE")
+                hint.setObjectName("hint")
+                hint.setAlignment(Qt.AlignCenter)
 
                 layout = QVBoxLayout(self)
-                layout.addWidget(self.orb)
-                layout.setContentsMargins(15, 15, 15, 15)
-                title.hide()
-                self.state.hide()
-                self.history.hide()
-                self.input.hide()
-                send.hide()
-                listen.hide()
+                layout.setContentsMargins(0, 0, 0, 18)
+                layout.addWidget(header)
+                layout.addStretch()
+                layout.addWidget(self.orb, alignment=Qt.AlignCenter)
+                layout.addStretch()
+                layout.addWidget(hint)
+                self.result_ready.connect(self.show_result)
+                self.state_changed.connect(self.set_state)
                 self.start_wake_listener()
-
-            def mouseDoubleClickEvent(self, event) -> None:
-                self.close()
 
             def start_wake_listener(self) -> None:
                 Thread(
@@ -104,19 +102,12 @@ class JarvisWindow:
             def _voice_state(self, state: str) -> None:
                 self.state_changed.emit(state)
 
-            def submit_text(self) -> None:
-                text = self.input.text().strip()
-                if text:
-                    self.input.clear()
-                    self.execute(text)
-
             def execute(self, text: str) -> None:
-                self.history.appendPlainText(f"Tú: {text}")
-                self.set_state("Procesando...")
+                self.set_state("PROCESSING")
                 result = application.process_command(text)
                 self.show_result(result.message, result.success)
                 if result.speak:
-                    self.set_state("Hablando...")
+                    self.set_state("SPEAKING")
                     Thread(
                         target=self._speak_result,
                         args=(result,),
@@ -128,48 +119,33 @@ class JarvisWindow:
             def _speak_result(self, result) -> None:
                 application.speech.say(result.message)
                 application.complete_command(result)
-                self.state_changed.emit("Di 'Jarvis' para activar")
-
-            def listen(self) -> None:
-                if self.listen_button.isChecked():
-                    self.set_state("Escuchando...")
-                    Thread(target=self._listen_worker, daemon=True).start()
-                else:
-                    self.set_state("Di 'Jarvis' para activar")
-
-            def _listen_worker(self) -> None:
-                try:
-                    text = SpeechListener().listen()
-                    self.result_ready.emit(f"__COMMAND__{text}", True)
-                except RuntimeError as error:
-                    self.result_ready.emit(str(error), False)
-                finally:
-                    self.listen_button.setChecked(False)
+                self.state_changed.emit("STANDBY")
 
             def show_result(self, message: str, success: bool = True) -> None:
                 if message.startswith("__COMMAND__"):
                     self.execute(message.removeprefix("__COMMAND__"))
                     return
-                prefix = "Jarvis" if success else "Error"
-                self.history.appendPlainText(f"{prefix}: {message}")
                 if not success:
-                    self.set_state(message)
+                    self.set_state("ERROR")
 
             def set_state(self, state: str) -> None:
-                self.state.setText(state)
+                self.status.setText(state.upper())
                 lowered = state.casefold()
-                if "escuch" in lowered:
+                if "escuch" in lowered or "listening" in lowered:
                     self.orb.set_state("listening")
                 elif "proces" in lowered:
                     self.orb.set_state("processing")
-                elif "habland" in lowered:
+                elif "habland" in lowered or "speaking" in lowered:
                     self.orb.set_state("speaking")
-                elif "error" in lowered or "no pude" in lowered:
+                elif "error" in lowered:
                     self.orb.set_state("error")
-                elif "activar" in lowered:
+                elif "activar" in lowered or "wake" in lowered:
                     self.orb.set_state("wake")
                 else:
                     self.orb.set_state("idle")
+
+            def mouseDoubleClickEvent(self, event) -> None:
+                self.close()
 
             def closeEvent(self, event) -> None:
                 self.stop_event.set()

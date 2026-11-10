@@ -22,7 +22,14 @@ class MusicActions:
 
         encoded = urllib.parse.quote(query)
         if service == "spotify":
+            if not self._spotify_configured():
+                return CommandResult(
+                    "Spotify todavía no está configurado. Completa SPOTIFY_CLIENT_ID y "
+                    "SPOTIFY_CLIENT_SECRET en .env.",
+                    success=False,
+                )
             target = f"spotify:search:{encoded}"
+
             def open_search() -> None:
                 if self._play_spotify(query):
                     return
@@ -35,7 +42,7 @@ class MusicActions:
                     webbrowser.open(f"https://open.spotify.com/search/{encoded}")
 
             return CommandResult(
-                f"Reproduciendo {query} en Spotify.",
+                f"Voy a reproducir {query} en Spotify.",
                 action=open_search if deferred else None,
             )
 
@@ -50,6 +57,13 @@ class MusicActions:
         return CommandResult(
             f"No tengo configurado el servicio musical '{service}'.",
             success=False,
+        )
+
+    @staticmethod
+    def _spotify_configured() -> bool:
+        return bool(
+            os.environ.get("SPOTIFY_CLIENT_ID")
+            and os.environ.get("SPOTIFY_CLIENT_SECRET")
         )
 
     @staticmethod
@@ -79,7 +93,11 @@ class MusicActions:
                 return False
             devices = spotify.devices()["devices"]
             active = next((device for device in devices if device["is_active"]), None)
-            if active is None and not devices:
+            if not devices:
+                print(
+                    "[MUSICA] Spotify no tiene ningún dispositivo activo. "
+                    "Abre Spotify e inicia sesión antes de reproducir."
+                )
                 return False
             device_id = active["id"] if active else devices[0]["id"]
             spotify.start_playback(device_id=device_id, uris=[tracks[0]["uri"]])
