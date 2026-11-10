@@ -38,22 +38,22 @@ class StatusOrb:
                 painter.fillRect(self.rect(), Qt.transparent)
                 center = QPointF(self.width() / 2, self.height() / 2)
                 colors = {
-                    "idle": QColor("#3b82f6"),
-                    "wake": QColor("#22d3ee"),
-                    "listening": QColor("#a78bfa"),
-                    "processing": QColor("#f59e0b"),
-                    "speaking": QColor("#34d399"),
-                    "error": QColor("#fb7185"),
+                    "idle": QColor("#c45b1b"),
+                    "wake": QColor("#f28c28"),
+                    "listening": QColor("#ffb347"),
+                    "processing": QColor("#e87519"),
+                    "speaking": QColor("#ff9d3d"),
+                    "error": QColor("#c23b22"),
                 }
                 color = colors.get(self.state, colors["idle"])
                 pulse = 1 + 0.08 * math.sin(self.phase * 1.7)
                 if self.state in {"listening", "speaking"}:
                     pulse += 0.08 * math.sin(self.phase * 3)
-                radius = 44 * pulse
-                for ring in range(3, 0, -1):
-                    alpha = 20 + ring * 12
+                radius = 48 * pulse
+                for ring in range(5, 0, -1):
+                    alpha = 14 + ring * 10
                     painter.setPen(QColor(color.red(), color.green(), color.blue(), alpha))
-                    ring_radius = radius + ring * 17 + 5 * math.sin(self.phase + ring)
+                    ring_radius = radius + ring * 21 + 7 * math.sin(self.phase + ring)
                     painter.drawEllipse(center, ring_radius, ring_radius)
                 if self.state in {"listening", "speaking"}:
                     for wave in range(12):
@@ -68,12 +68,21 @@ class StatusOrb:
                         )
                         painter.drawEllipse(point, 3.5, 3.5)
                 gradient = QRadialGradient(center, radius)
-                gradient.setColorAt(0, QColor(255, 255, 255, 230))
+                gradient.setColorAt(0, QColor(255, 245, 220, 245))
                 gradient.setColorAt(0.25, QColor(color.red(), color.green(), color.blue(), 240))
                 gradient.setColorAt(1, QColor(color.red(), color.green(), color.blue(), 80))
                 painter.setPen(Qt.NoPen)
                 painter.setBrush(gradient)
                 painter.drawEllipse(center, radius, radius)
+                for index in range(24):
+                    angle = self.phase * 0.35 + index * math.pi / 12
+                    distance = radius + 65 + 12 * math.sin(self.phase * 1.8 + index)
+                    point = QPointF(
+                        center.x() + math.cos(angle) * distance,
+                        center.y() + math.sin(angle) * distance,
+                    )
+                    painter.setPen(QColor(color.red(), color.green(), color.blue(), 130))
+                    painter.drawLine(center, point)
 
         from PySide6.QtCore import Qt
 

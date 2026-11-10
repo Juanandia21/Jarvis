@@ -39,7 +39,11 @@ class CommandRouter:
             normalized,
         )
         if match:
-            return self.applications.close(match.group(1).strip())
+            requested = match.group(1).strip()
+            return CommandResult(
+                f"Cerrando {requested}.",
+                action=lambda: self.applications.close(requested),
+            )
 
         match = re.fullmatch(
             r"(?:pon|pone|ponga|reproduce|reproducí|reproducir|escucha|escuchar)"
@@ -47,9 +51,12 @@ class CommandRouter:
             normalized,
         )
         if match:
+            query = match.group(1)
+            service = (match.group(2) or "spotify").replace(" ", "_")
             return self.music.play(
-                match.group(1),
-                (match.group(2) or "spotify").replace(" ", "_"),
+                query,
+                service,
+                deferred=True,
             )
 
         if normalized in {"voces", "listar voces", "mostrar voces"}:
@@ -103,7 +110,11 @@ class CommandRouter:
             normalized,
         )
         if match:
-            return self.applications.open(match.group(1))
+            requested = match.group(1)
+            return CommandResult(
+                f"Abriendo {requested}.",
+                action=lambda: self.applications.open(requested),
+            )
 
         return CommandResult(
             "Todavía no conozco ese comando. Prueba con 'abre Spotify' o 'modo gaming'.",

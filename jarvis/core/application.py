@@ -24,6 +24,10 @@ class JarvisApplication:
     def process_command(self, text: str):
         return self.router.handle(text)
 
+    def complete_command(self, result) -> None:
+        if result.action is not None:
+            result.action()
+
     def run_console(self) -> None:
         self.ui.show("ready", "Jarvis listo. Escribe un comando o 'salir'.")
         self.speech.say("Jarvis listo.")
@@ -45,6 +49,7 @@ class JarvisApplication:
             self.ui.show("ready", result.message)
             if result.speak:
                 self.speech.say(result.message)
+            self.complete_command(result)
 
         self.ui.show("stopped", "Jarvis apagado.")
 

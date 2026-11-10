@@ -39,7 +39,7 @@ class JarvisWindow:
                 self.setFixedSize(390, 390)
                 self.setStyleSheet(
                     """
-                    QDialog { background: transparent; color: #e7eef8; }
+                    QDialog { background: transparent; color: #f5e1c4; }
                     QLabel#title { font-size: 30px; font-weight: bold; color: #dbeafe; }
                     QLabel#state { color: #93c5fd; font-size: 14px; }
                     QPlainTextEdit, QLineEdit {
@@ -119,12 +119,15 @@ class JarvisWindow:
                     self.set_state("Hablando...")
                     Thread(
                         target=self._speak_result,
-                        args=(result.message,),
+                        args=(result,),
                         daemon=True,
                     ).start()
+                else:
+                    application.complete_command(result)
 
-            def _speak_result(self, message: str) -> None:
-                application.speech.say(message)
+            def _speak_result(self, result) -> None:
+                application.speech.say(result.message)
+                application.complete_command(result)
                 self.state_changed.emit("Di 'Jarvis' para activar")
 
             def listen(self) -> None:
