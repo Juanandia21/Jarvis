@@ -29,10 +29,10 @@ Applications and routines are configured in `config/jarvis.json`. The console
 is temporary; wake-word detection, speech recognition and the visual interface
 will be connected to the same core services in later steps.
 
-`voces` lists the voices installed in Windows through SAPI. Use `voz 1`,
-`voz 2`, etc. to select one. Use `probar voz 1` or `probar voz 2` to hear a
-sample immediately. The available voices
-depend on the language packs installed in Windows.
+`voces` lists the available Edge neural voices. Use `voz 1`, `voz 2`, etc. to
+select one. Use `probar voz 1` or `probar voz 2` to hear a sample immediately.
+These voices sound more natural than the basic Windows SAPI voices and require
+an internet connection. If Edge TTS is unavailable, Jarvis falls back to SAPI.
 
 ## Legacy MVP
 

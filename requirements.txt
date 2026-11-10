@@ -1,2 +1,6 @@
-# Optional local speech output. The console works without this package.
+# Natural neural voices from Microsoft Edge (requires internet).
+edge-tts>=7.0.0
+# Audio playback for generated MP3 files.
+pygame>=2.6.0
+# Fallback Windows speech engine.
 pyttsx3>=2.90
