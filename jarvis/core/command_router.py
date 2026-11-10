@@ -52,6 +52,31 @@ class CommandRouter:
                 )
             return CommandResult(f"Voz {number} seleccionada: {selected}.")
 
+        match = re.fullmatch(r"(?:probar|test)\s+voz\s+(\d+)", normalized)
+        if match:
+            number = int(match.group(1))
+            selected = self.speech.select_voice(number)
+            if selected is None:
+                return CommandResult(
+                    "No existe esa voz. Escribe 'voces' para ver las disponibles.",
+                    success=False,
+                )
+            return CommandResult(
+                f"Esta es la voz {number}, {selected}. Así sonaría Jarvis.",
+            )
+
+        if normalized in {"probar voces", "test voces"}:
+            voices = self.speech.voices()
+            if not voices:
+                return CommandResult(
+                    "No hay voces locales disponibles.",
+                    success=False,
+                )
+            return CommandResult(
+                "Prueba de voces iniciada. Usa 'probar voz 1' para escuchar una voz.",
+                speak=True,
+            )
+
         match = re.fullmatch(r"(?:abre|abrir|inicia|iniciar)\s+(.+)", normalized)
         if match:
             return self.applications.open(match.group(1))

@@ -30,7 +30,8 @@ is temporary; wake-word detection, speech recognition and the visual interface
 will be connected to the same core services in later steps.
 
 `voces` lists the voices installed in Windows through SAPI. Use `voz 1`,
-`voz 2`, etc. to select one and hear the confirmation. The available voices
+`voz 2`, etc. to select one. Use `probar voz 1` or `probar voz 2` to hear a
+sample immediately. The available voices
 depend on the language packs installed in Windows.
 
 ## Legacy MVP
