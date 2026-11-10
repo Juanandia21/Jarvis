@@ -1,0 +1,20 @@
+{
+  "applications": {
+    "spotify": "spotify:",
+    "discord": "discord:",
+    "youtube": "https://www.youtube.com",
+    "navegador": "https://www.google.com"
+  },
+  "routines": {
+    "gaming": [
+      {
+        "action": "open",
+        "target": "discord"
+      },
+      {
+        "action": "open",
+        "target": "spotify"
+      }
+    ]
+  }
+}

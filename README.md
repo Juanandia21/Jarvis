@@ -1,4 +1,36 @@
-# 🤖 Jarvis MVP
+# 🤖 Jarvis
+
+The original `jarvis_mvp.py` is preserved unchanged as the first working MVP.
+The new modular implementation starts in `app.py` and is intentionally being
+built alongside it.
+
+## New modular version
+
+From the project directory on Windows:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install -r requirements.txt
+python app.py
+```
+
+The first version uses a lightweight console to validate the command engine:
+
+```text
+abre Spotify
+modo gaming
+salir
+```
+
+Applications and routines are configured in `config/jarvis.json`. The console
+is temporary; wake-word detection, speech recognition and the visual interface
+will be connected to the same core services in later steps.
+
+## Legacy MVP
+
+The clap-activated implementation remains in `jarvis_mvp.py` and is not used
+by the new application.
 
 Asistente personal estilo Jarvis activado por **doble aplauso**. Al detectarlo, saluda con voz, abre YouTube en la TV (monitor secundario vía HDMI) y lanza AntiGravity en el monitor principal.
 
