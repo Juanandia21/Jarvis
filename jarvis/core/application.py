@@ -17,6 +17,7 @@ class JarvisApplication:
         self.actions = ApplicationActions(config.apps)
         self.routines = RoutineActions(config.routines, self.actions)
         self.router = CommandRouter(self.actions, self.routines, self.speech)
+        self.window = None
 
     def process_command(self, text: str):
         return self.router.handle(text)
@@ -48,5 +49,5 @@ class JarvisApplication:
     def run_ui(self) -> None:
         from jarvis.ui.window import JarvisWindow
 
-        window = JarvisWindow(self)
-        window.show()
+        self.window = JarvisWindow(self)
+        self.window.show()
