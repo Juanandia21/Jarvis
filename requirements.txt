@@ -1,0 +1,2 @@
+# Optional local speech output. The console works without this package.
+pyttsx3>=2.90
