@@ -77,7 +77,10 @@ class CommandRouter:
                 speak=True,
             )
 
-        match = re.fullmatch(r"(?:abre|abrir|inicia|iniciar)\s+(.+)", normalized)
+        match = re.fullmatch(
+            r"(?:por favor\s+)?(?:abre|abrí|abrir|inicia|iniciar)\s+(.+?)(?:\s+por favor)?",
+            normalized,
+        )
         if match:
             return self.applications.open(match.group(1))
 
@@ -88,4 +91,5 @@ class CommandRouter:
 
     @staticmethod
     def _normalize(text: str) -> str:
-        return " ".join(text.casefold().strip().split())
+        normalized = " ".join(text.casefold().strip().split())
+        return normalized.replace("abrí ", "abre ")

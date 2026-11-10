@@ -15,8 +15,10 @@ python -m pip install -r requirements.txt
 python app.py
 ```
 
-The first visual version includes text input and a push-to-talk `Escuchar`
-button. To use the previous console:
+The visual version includes a minimal animated orb, text input, push-to-talk
+`Escuchar`, and background activation when it hears `Jarvis`. After the wake
+word, say the command in the same phrase (`Jarvis, abre Spotify`) or pause
+after `Jarvis` and then say the command. To use the previous console:
 
 ```text
 python app.py --console
