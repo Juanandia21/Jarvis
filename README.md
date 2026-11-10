@@ -15,9 +15,12 @@ python -m pip install -r requirements.txt
 python app.py
 ```
 
-The first version uses a lightweight console to validate the command engine:
+The first visual version includes text input and a push-to-talk `Escuchar`
+button. To use the previous console:
 
 ```text
+python app.py --console
+
 abre Spotify
 modo gaming
 voces
