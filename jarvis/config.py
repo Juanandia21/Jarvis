@@ -24,6 +24,10 @@ class JarvisConfig:
     def routines(self) -> dict[str, list[dict[str, Any]]]:
         return self.data.get("routines", {})
 
+    @property
+    def assistant(self) -> dict[str, Any]:
+        return self.data.get("assistant", {})
+
 
 def load_config(path: Path = DEFAULT_CONFIG_PATH) -> JarvisConfig:
     if not path.exists():

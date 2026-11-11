@@ -34,6 +34,19 @@ Applications and routines are configured in `config/jarvis.json`. The console
 is temporary; wake-word detection, speech recognition and the visual interface
 will be connected to the same core services in later steps.
 
+## Conversational foundation
+
+Unknown commands are now sent to an optional local Ollama provider instead of
+always returning a fixed response. Install Ollama separately, then run:
+
+```powershell
+ollama pull qwen2.5:3b
+```
+
+Conversation history is stored locally in
+`%USERPROFILE%\.jarvis_conversation.sqlite3` and can be cleared from Jarvis
+with `borra la conversación`.
+
 `voces` lists the available Edge neural voices. Use `voz 1`, `voz 2`, etc. to
 select one. Use `probar voz 1` or `probar voz 2` to hear a sample immediately.
 These voices sound more natural than the basic Windows SAPI voices and require

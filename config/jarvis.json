@@ -16,5 +16,9 @@
         "target": "spotify"
       }
     ]
+  },
+  "assistant": {
+    "conversation_model": "qwen2.5:3b",
+    "conversation_endpoint": "http://127.0.0.1:11434/api/chat"
   }
 }

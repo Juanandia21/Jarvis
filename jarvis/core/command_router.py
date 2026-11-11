@@ -13,6 +13,7 @@ from jarvis.actions.routines import RoutineActions
 from jarvis.core.results import CommandResult
 from jarvis.core.speech import SpeechService
 from jarvis.actions.music import MusicActions
+from jarvis.core.conversation import ConversationService
 
 
 class CommandRouter:
@@ -22,11 +23,13 @@ class CommandRouter:
         routines: RoutineActions,
         speech: SpeechService,
         music: MusicActions,
+        conversation: ConversationService,
     ) -> None:
         self.applications = applications
         self.routines = routines
         self.speech = speech
         self.music = music
+        self.conversation = conversation
 
     def handle(self, text: str) -> CommandResult:
         normalized = self._normalize(text)
@@ -105,6 +108,15 @@ class CommandRouter:
                 speak=True,
             )
 
+        if normalized in {
+            "borra la conversación",
+            "borrar conversación",
+            "olvida esta conversación",
+            "limpia el chat",
+        }:
+            self.conversation.memory.clear()
+            return CommandResult("Conversación borrada.")
+
         match = re.fullmatch(
             r"(?:por favor\s+)?(?:abre|abrí|abrir|inicia|iniciar)\s+(.+?)(?:\s+por favor)?",
             normalized,
@@ -116,8 +128,12 @@ class CommandRouter:
                 action=lambda: self.applications.open(requested),
             )
 
+        answer = self.conversation.respond(text)
+        if answer is not None:
+            return CommandResult(answer)
         return CommandResult(
-            "Todavía no conozco ese comando. Prueba con 'abre Spotify' o 'modo gaming'.",
+            "Todavía no tengo activado el motor conversacional local. "
+            "Instala Ollama y carga el modelo configurado para poder conversar.",
             success=False,
         )
 

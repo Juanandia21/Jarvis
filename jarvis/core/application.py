@@ -9,6 +9,9 @@ from jarvis.actions.applications import ApplicationActions
 from jarvis.actions.routines import RoutineActions
 from jarvis.actions.music import MusicActions
 from jarvis.ui.status import StatusUI
+from jarvis.core.conversation import ConversationService
+from jarvis.core.memory import ConversationMemory
+from pathlib import Path
 
 
 class JarvisApplication:
@@ -18,7 +21,23 @@ class JarvisApplication:
         self.actions = ApplicationActions(config.apps)
         self.routines = RoutineActions(config.routines, self.actions)
         self.music = MusicActions()
-        self.router = CommandRouter(self.actions, self.routines, self.speech, self.music)
+        memory = ConversationMemory(Path.home() / ".jarvis_conversation.sqlite3")
+        assistant = config.assistant
+        self.conversation = ConversationService(
+            memory,
+            model=assistant.get("conversation_model", "qwen2.5:3b"),
+            endpoint=assistant.get(
+                "conversation_endpoint",
+                "http://127.0.0.1:11434/api/chat",
+            ),
+        )
+        self.router = CommandRouter(
+            self.actions,
+            self.routines,
+            self.speech,
+            self.music,
+            self.conversation,
+        )
         self.window = None
 
     def process_command(self, text: str):
